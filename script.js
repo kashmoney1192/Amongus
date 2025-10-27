@@ -5,6 +5,15 @@ let roles = [];
 let currentPlayerIndex = 0;
 let roleRevealed = false;
 
+// Role Settings
+let roleSettings = {
+    enableEngineer: true,
+    enableScientist: true,
+    enableGuardian: true,
+    enableShapeshifter: true,
+    enableSaboteur: true
+};
+
 // Role Definitions
 const roleData = {
     // Crewmate roles
@@ -234,6 +243,14 @@ function updateCrewmateCount() {
     document.getElementById('imposterDisplay').textContent = imposterCount;
 }
 
+function updateRoleSettings() {
+    roleSettings.enableEngineer = document.getElementById('enableEngineer').checked;
+    roleSettings.enableScientist = document.getElementById('enableScientist').checked;
+    roleSettings.enableGuardian = document.getElementById('enableGuardian').checked;
+    roleSettings.enableShapeshifter = document.getElementById('enableShapeshifter').checked;
+    roleSettings.enableSaboteur = document.getElementById('enableSaboteur').checked;
+}
+
 // Role Generation
 function generateRoles() {
     roles = [];
@@ -254,12 +271,21 @@ function generateRoles() {
         specialImposterCount = 1;
     }
 
+    // Build available role arrays based on settings
+    const availableImposterRoles = [];
+    if (roleSettings.enableShapeshifter) availableImposterRoles.push('shapeshifter');
+    if (roleSettings.enableSaboteur) availableImposterRoles.push('saboteur');
+
+    const availableCrewRoles = [];
+    if (roleSettings.enableEngineer) availableCrewRoles.push('engineer');
+    if (roleSettings.enableScientist) availableCrewRoles.push('scientist');
+    if (roleSettings.enableGuardian) availableCrewRoles.push('guardian');
+
     // Create imposter roles
-    const imposterRoleTypes = ['shapeshifter', 'saboteur'];
     for (let i = 0; i < imposterCount; i++) {
-        if (i < specialImposterCount && Math.random() > 0.3) {
+        if (i < specialImposterCount && availableImposterRoles.length > 0 && Math.random() > 0.3) {
             // Assign special imposter role
-            const specialRole = imposterRoleTypes[Math.floor(Math.random() * imposterRoleTypes.length)];
+            const specialRole = availableImposterRoles[Math.floor(Math.random() * availableImposterRoles.length)];
             roles.push(specialRole);
             specialImposterCount--; // Only one special imposter
         } else {
@@ -268,20 +294,25 @@ function generateRoles() {
     }
 
     // Create crewmate roles
-    const crewRoleTypes = ['engineer', 'scientist', 'guardian'];
     const assignedSpecialRoles = [];
 
     for (let i = 0; i < crewmateCount; i++) {
-        if (specialCrewCount > 0 && Math.random() > 0.4) {
+        if (specialCrewCount > 0 && availableCrewRoles.length > 0 && Math.random() > 0.4) {
             // Assign special crewmate role (avoid duplicates)
             let specialRole;
+            let attempts = 0;
             do {
-                specialRole = crewRoleTypes[Math.floor(Math.random() * crewRoleTypes.length)];
-            } while (assignedSpecialRoles.includes(specialRole) && assignedSpecialRoles.length < crewRoleTypes.length);
+                specialRole = availableCrewRoles[Math.floor(Math.random() * availableCrewRoles.length)];
+                attempts++;
+            } while (assignedSpecialRoles.includes(specialRole) && attempts < availableCrewRoles.length * 2);
 
-            roles.push(specialRole);
-            assignedSpecialRoles.push(specialRole);
-            specialCrewCount--;
+            if (!assignedSpecialRoles.includes(specialRole)) {
+                roles.push(specialRole);
+                assignedSpecialRoles.push(specialRole);
+                specialCrewCount--;
+            } else {
+                roles.push('crewmate');
+            }
         } else {
             roles.push('crewmate');
         }

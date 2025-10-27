@@ -345,6 +345,112 @@ body::before {
     color: rgba(255, 255, 255, 0.5);
 }
 
+/* Special Roles Section */
+.special-roles-section {
+    margin: 25px 0;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 20px;
+    border-radius: 15px;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.section-title {
+    font-size: 1.3rem;
+    margin-bottom: 20px;
+    color: #f1c40f;
+    text-shadow: 0 0 10px rgba(241, 196, 15, 0.5);
+    text-align: center;
+    letter-spacing: 2px;
+}
+
+.role-toggles {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.toggle-group {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 12px;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+
+.toggle-group:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.toggle-label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    font-size: 1.1rem;
+    position: relative;
+    user-select: none;
+}
+
+.toggle-label.crew-label {
+    color: #5ed3f3;
+}
+
+.toggle-label.imposter-label {
+    color: #ff4757;
+}
+
+.role-emoji {
+    margin-right: 10px;
+    font-size: 1.3rem;
+}
+
+.toggle-label input[type="checkbox"] {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.toggle-switch {
+    position: relative;
+    width: 50px;
+    height: 26px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 13px;
+    transition: background 0.3s ease;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.toggle-switch::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 18px;
+    height: 18px;
+    background: white;
+    border-radius: 50%;
+    transition: transform 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+.toggle-label input[type="checkbox"]:checked ~ .toggle-switch {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-color: #667eea;
+}
+
+.toggle-label input[type="checkbox"]:checked ~ .toggle-switch::after {
+    transform: translateX(24px);
+}
+
+.toggle-label.crew-label input[type="checkbox"]:checked ~ .toggle-switch {
+    background: linear-gradient(135deg, #2980b9 0%, #3498db 100%);
+    border-color: #5ed3f3;
+}
+
+.toggle-label.imposter-label input[type="checkbox"]:checked ~ .toggle-switch {
+    background: linear-gradient(135deg, #c0392b 0%, #e74c3c 100%);
+    border-color: #ff4757;
+}
+
 /* Info Box */
 .info-box {
     background: rgba(0, 0, 0, 0.3);

@@ -61,6 +61,52 @@
                 </div>
             </div>
 
+            <div class="special-roles-section">
+                <h3 class="section-title">✨ SPECIAL ROLES</h3>
+
+                <div class="role-toggles">
+                    <div class="toggle-group">
+                        <label class="toggle-label crew-label">
+                            <span class="role-emoji">🔧</span> Engineer
+                            <input type="checkbox" id="enableEngineer" checked onchange="updateRoleSettings()">
+                            <span class="toggle-switch"></span>
+                        </label>
+                    </div>
+
+                    <div class="toggle-group">
+                        <label class="toggle-label crew-label">
+                            <span class="role-emoji">🔬</span> Scientist
+                            <input type="checkbox" id="enableScientist" checked onchange="updateRoleSettings()">
+                            <span class="toggle-switch"></span>
+                        </label>
+                    </div>
+
+                    <div class="toggle-group">
+                        <label class="toggle-label crew-label">
+                            <span class="role-emoji">👼</span> Guardian Angel
+                            <input type="checkbox" id="enableGuardian" checked onchange="updateRoleSettings()">
+                            <span class="toggle-switch"></span>
+                        </label>
+                    </div>
+
+                    <div class="toggle-group">
+                        <label class="toggle-label imposter-label">
+                            <span class="role-emoji">🎭</span> Shapeshifter
+                            <input type="checkbox" id="enableShapeshifter" checked onchange="updateRoleSettings()">
+                            <span class="toggle-switch"></span>
+                        </label>
+                    </div>
+
+                    <div class="toggle-group">
+                        <label class="toggle-label imposter-label">
+                            <span class="role-emoji">⚡</span> Saboteur
+                            <input type="checkbox" id="enableSaboteur" checked onchange="updateRoleSettings()">
+                            <span class="toggle-switch"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
             <button class="btn btn-primary" onclick="startGame()">
                 GENERATE ROLES
             </button>
