@@ -5,6 +5,61 @@ let roles = [];
 let currentPlayerIndex = 0;
 let roleRevealed = false;
 
+// Role Definitions
+const roleData = {
+    // Crewmate roles
+    'crewmate': {
+        name: 'CREWMATE',
+        icon: '👨‍🚀',
+        description: 'Complete tasks and find the imposters!',
+        color: 'crewmate',
+        team: 'crew'
+    },
+    'engineer': {
+        name: 'ENGINEER',
+        icon: '🔧',
+        description: 'Can use vents and fix sabotages faster!',
+        color: 'engineer',
+        team: 'crew'
+    },
+    'scientist': {
+        name: 'SCIENTIST',
+        icon: '🔬',
+        description: 'Access vitals anytime to monitor crew health!',
+        color: 'scientist',
+        team: 'crew'
+    },
+    'guardian': {
+        name: 'GUARDIAN ANGEL',
+        icon: '👼',
+        description: 'Protect a player from being killed once per round!',
+        color: 'guardian',
+        team: 'crew'
+    },
+    // Imposter roles
+    'imposter': {
+        name: 'IMPOSTER',
+        icon: '🔪',
+        description: 'Eliminate crewmates without getting caught!',
+        color: 'imposter',
+        team: 'imposters'
+    },
+    'shapeshifter': {
+        name: 'SHAPESHIFTER',
+        icon: '🎭',
+        description: 'Transform into other players to deceive the crew!',
+        color: 'shapeshifter',
+        team: 'imposters'
+    },
+    'saboteur': {
+        name: 'SABOTEUR',
+        icon: '⚡',
+        description: 'Sabotage cooldown reduced - chaos master!',
+        color: 'saboteur',
+        team: 'imposters'
+    }
+};
+
 // Sound Effects (simple audio using Web Audio API)
 const AudioContext = window.AudioContext || window.webkitAudioContext;
 let audioContext;
@@ -39,6 +94,8 @@ function playSound(type) {
             oscillator.stop(audioContext.currentTime + 0.3);
             break;
         case 'imposter':
+        case 'shapeshifter':
+        case 'saboteur':
             oscillator.type = 'sawtooth';
             oscillator.frequency.value = 200;
             gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
@@ -53,6 +110,30 @@ function playSound(type) {
             gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
             oscillator.start(audioContext.currentTime);
             oscillator.stop(audioContext.currentTime + 0.3);
+            break;
+        case 'engineer':
+            oscillator.type = 'triangle';
+            oscillator.frequency.value = 700;
+            gainNode.gain.setValueAtTime(0.25, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.4);
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.4);
+            break;
+        case 'scientist':
+            oscillator.type = 'sine';
+            oscillator.frequency.value = 900;
+            gainNode.gain.setValueAtTime(0.25, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.4);
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.4);
+            break;
+        case 'guardian':
+            oscillator.type = 'sine';
+            oscillator.frequency.value = 1000;
+            gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.5);
             break;
     }
 }
@@ -157,12 +238,53 @@ function updateCrewmateCount() {
 function generateRoles() {
     roles = [];
 
-    // Create array with imposters and crewmates
-    for (let i = 0; i < imposterCount; i++) {
-        roles.push('imposter');
+    const crewmateCount = playerCount - imposterCount;
+
+    // Determine number of special roles (1-2 per game, based on player count)
+    let specialCrewCount = 0;
+    let specialImposterCount = 0;
+
+    if (playerCount >= 5) {
+        // Add 1-2 special crewmate roles for games with 5+ players
+        specialCrewCount = crewmateCount >= 4 ? Math.min(2, Math.floor(crewmateCount / 3)) : 0;
     }
-    for (let i = 0; i < playerCount - imposterCount; i++) {
-        roles.push('crewmate');
+
+    if (playerCount >= 6 && imposterCount >= 2) {
+        // Add 1 special imposter role if there are 2+ imposters
+        specialImposterCount = 1;
+    }
+
+    // Create imposter roles
+    const imposterRoleTypes = ['shapeshifter', 'saboteur'];
+    for (let i = 0; i < imposterCount; i++) {
+        if (i < specialImposterCount && Math.random() > 0.3) {
+            // Assign special imposter role
+            const specialRole = imposterRoleTypes[Math.floor(Math.random() * imposterRoleTypes.length)];
+            roles.push(specialRole);
+            specialImposterCount--; // Only one special imposter
+        } else {
+            roles.push('imposter');
+        }
+    }
+
+    // Create crewmate roles
+    const crewRoleTypes = ['engineer', 'scientist', 'guardian'];
+    const assignedSpecialRoles = [];
+
+    for (let i = 0; i < crewmateCount; i++) {
+        if (specialCrewCount > 0 && Math.random() > 0.4) {
+            // Assign special crewmate role (avoid duplicates)
+            let specialRole;
+            do {
+                specialRole = crewRoleTypes[Math.floor(Math.random() * crewRoleTypes.length)];
+            } while (assignedSpecialRoles.includes(specialRole) && assignedSpecialRoles.length < crewRoleTypes.length);
+
+            roles.push(specialRole);
+            assignedSpecialRoles.push(specialRole);
+            specialCrewCount--;
+        } else {
+            roles.push('crewmate');
+        }
     }
 
     // Shuffle roles using Fisher-Yates algorithm
@@ -204,26 +326,31 @@ function revealRole() {
     playSound('reveal');
     roleRevealed = true;
 
-    const role = roles[currentPlayerIndex];
+    const roleKey = roles[currentPlayerIndex];
+    const role = roleData[roleKey];
     const roleCardRevealed = document.getElementById('roleCardRevealed');
     const roleCardHidden = document.getElementById('roleCardHidden');
 
     // Hide the hidden card
     roleCardHidden.style.display = 'none';
 
-    // Setup and show revealed card
-    if (role === 'imposter') {
-        playSound('imposter');
-        roleCardRevealed.className = 'role-card revealed-role imposter';
-        document.getElementById('roleName').textContent = 'IMPOSTER';
-        document.getElementById('roleIcon').textContent = '🔪';
-        document.getElementById('roleDescription').textContent = 'Eliminate the crewmates without getting caught!';
+    // Play role-specific sound
+    playSound(roleKey);
+
+    // Setup and show revealed card with role data
+    roleCardRevealed.className = `role-card revealed-role ${role.color}`;
+    document.getElementById('roleName').textContent = role.name;
+    document.getElementById('roleIcon').textContent = role.icon;
+    document.getElementById('roleDescription').textContent = role.description;
+
+    // Add team badge
+    const teamBadge = document.getElementById('teamBadge');
+    if (role.team === 'imposters') {
+        teamBadge.textContent = '🔴 IMPOSTER TEAM';
+        teamBadge.className = 'team-badge imposter-team';
     } else {
-        playSound('crewmate');
-        roleCardRevealed.className = 'role-card revealed-role crewmate';
-        document.getElementById('roleName').textContent = 'CREWMATE';
-        document.getElementById('roleIcon').textContent = '👨‍🚀';
-        document.getElementById('roleDescription').textContent = 'Complete tasks and find the imposters!';
+        teamBadge.textContent = '🔵 CREWMATE TEAM';
+        teamBadge.className = 'team-badge crew-team';
     }
 
     roleCardRevealed.style.display = 'flex';

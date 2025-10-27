@@ -434,6 +434,67 @@ body::before {
         inset 0 0 30px rgba(255, 71, 87, 0.2);
 }
 
+.revealed-role.engineer {
+    background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+    border: 3px solid #f1c40f;
+    box-shadow:
+        0 10px 30px rgba(241, 196, 15, 0.4),
+        0 0 40px rgba(241, 196, 15, 0.3),
+        inset 0 0 30px rgba(241, 196, 15, 0.2);
+}
+
+.revealed-role.scientist {
+    background: linear-gradient(135deg, #16a085 0%, #1abc9c 100%);
+    border: 3px solid #2ecc71;
+    box-shadow:
+        0 10px 30px rgba(46, 204, 113, 0.4),
+        0 0 40px rgba(46, 204, 113, 0.3),
+        inset 0 0 30px rgba(46, 204, 113, 0.2);
+}
+
+.revealed-role.guardian {
+    background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
+    border: 3px solid #e74cdb;
+    box-shadow:
+        0 10px 30px rgba(231, 76, 219, 0.4),
+        0 0 40px rgba(231, 76, 219, 0.3),
+        inset 0 0 30px rgba(231, 76, 219, 0.2);
+}
+
+.revealed-role.shapeshifter {
+    background: linear-gradient(135deg, #7f0000 0%, #b30000 100%);
+    border: 3px solid #ff1744;
+    box-shadow:
+        0 10px 30px rgba(255, 23, 68, 0.5),
+        0 0 50px rgba(255, 23, 68, 0.4),
+        inset 0 0 30px rgba(255, 23, 68, 0.3);
+    animation: shapeshifterPulse 2s ease-in-out infinite;
+}
+
+.revealed-role.saboteur {
+    background: linear-gradient(135deg, #b71c1c 0%, #d32f2f 100%);
+    border: 3px solid #ffeb3b;
+    box-shadow:
+        0 10px 30px rgba(255, 235, 59, 0.4),
+        0 0 40px rgba(255, 235, 59, 0.3),
+        inset 0 0 30px rgba(255, 235, 59, 0.2);
+}
+
+@keyframes shapeshifterPulse {
+    0%, 100% {
+        box-shadow:
+            0 10px 30px rgba(255, 23, 68, 0.5),
+            0 0 50px rgba(255, 23, 68, 0.4),
+            inset 0 0 30px rgba(255, 23, 68, 0.3);
+    }
+    50% {
+        box-shadow:
+            0 15px 40px rgba(255, 23, 68, 0.6),
+            0 0 70px rgba(255, 23, 68, 0.5),
+            inset 0 0 40px rgba(255, 23, 68, 0.4);
+    }
+}
+
 @keyframes revealCard {
     0% {
         transform: rotateY(90deg) scale(0.8);
@@ -447,6 +508,43 @@ body::before {
 
 .card-content {
     text-align: center;
+}
+
+.team-badge {
+    display: inline-block;
+    padding: 8px 20px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    margin-bottom: 15px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    animation: badgeFadeIn 0.5s ease 0.3s backwards;
+}
+
+.team-badge.crew-team {
+    background: rgba(94, 211, 243, 0.3);
+    border: 2px solid #5ed3f3;
+    color: #5ed3f3;
+    text-shadow: 0 0 10px rgba(94, 211, 243, 0.5);
+}
+
+.team-badge.imposter-team {
+    background: rgba(255, 71, 87, 0.3);
+    border: 2px solid #ff4757;
+    color: #ff4757;
+    text-shadow: 0 0 10px rgba(255, 71, 87, 0.5);
+}
+
+@keyframes badgeFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .instruction {
