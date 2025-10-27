@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Among Us Role Generator</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Space Background Elements -->
+    <div class="stars"></div>
+    <div class="stars2"></div>
+    <div class="stars3"></div>
+
+    <!-- Title Screen -->
+    <div id="titleScreen" class="screen active">
+        <div class="container">
+            <div class="logo">
+                <h1 class="glitch" data-text="AMONG US">AMONG US</h1>
+                <h2 class="subtitle">ROLE GENERATOR</h2>
+            </div>
+            <button class="btn btn-primary pulse" onclick="showSetupScreen()">
+                START
+            </button>
+        </div>
+    </div>
+
+    <!-- Setup Screen -->
+    <div id="setupScreen" class="screen">
+        <div class="container">
+            <h2 class="screen-title">GAME SETUP</h2>
+
+            <div class="input-group">
+                <label for="playerCount">Number of Players</label>
+                <div class="input-controls">
+                    <button class="btn-small" onclick="adjustPlayers(-1)">-</button>
+                    <input type="number" id="playerCount" value="5" min="2" max="100" oninput="handlePlayerInput()">
+                    <button class="btn-small" onclick="adjustPlayers(1)">+</button>
+                </div>
+                <span class="range-label">2-100 players</span>
+            </div>
+
+            <div class="input-group">
+                <label for="imposterCount">Number of Imposters</label>
+                <div class="input-controls">
+                    <button class="btn-small" onclick="adjustimposters(-1)">-</button>
+                    <input type="number" id="imposterCount" value="2" min="1" max="99" oninput="handleImposterInput()">
+                    <button class="btn-small" onclick="adjustimposters(1)">+</button>
+                </div>
+                <span class="range-label">1-99 imposters</span>
+            </div>
+
+            <div class="info-box">
+                <div class="info-item">
+                    <span class="label">Crewmates:</span>
+                    <span id="crewmateCount" class="value blue">8</span>
+                </div>
+                <div class="info-item">
+                    <span class="label">Imposters:</span>
+                    <span id="imposterDisplay" class="value red">2</span>
+                </div>
+            </div>
+
+            <button class="btn btn-primary" onclick="startGame()">
+                GENERATE ROLES
+            </button>
+            <button class="btn btn-secondary" onclick="showTitleScreen()">
+                BACK
+            </button>
+        </div>
+    </div>
+
+    <!-- Role Reveal Screen -->
+    <div id="roleScreen" class="screen">
+        <div class="container">
+            <h2 class="screen-title">PLAYER <span id="currentPlayer">1</span></h2>
+
+            <div id="roleCardHidden" class="role-card hidden-role">
+                <div class="card-content">
+                    <p class="instruction">Tap to reveal your role</p>
+                    <div class="mystery-icon">?</div>
+                </div>
+            </div>
+
+            <div id="roleCardRevealed" class="role-card revealed-role" style="display: none;">
+                <div class="card-content">
+                    <h3 id="roleName" class="role-name">CREWMATE</h3>
+                    <div id="roleIcon" class="role-icon">👨‍🚀</div>
+                    <p id="roleDescription" class="role-description">Complete tasks and find the imposters!</p>
+                </div>
+            </div>
+
+            <button id="revealBtn" class="btn btn-primary pulse" onclick="revealRole()">
+                REVEAL ROLE
+            </button>
+            <button id="nextBtn" class="btn btn-primary" onclick="nextPlayer()" style="display: none;">
+                NEXT PLAYER
+            </button>
+            <button id="finishBtn" class="btn btn-success" onclick="finishGame()" style="display: none;">
+                FINISH GAME
+            </button>
+        </div>
+    </div>
+
+    <!-- Results Screen -->
+    <div id="resultsScreen" class="screen">
+        <div class="container">
+            <h2 class="screen-title">GAME READY!</h2>
+            <div class="results-box">
+                <p class="results-message">All roles have been assigned.</p>
+                <p class="results-submessage">Good luck, crewmates!</p>
+                <div class="stats">
+                    <div class="stat-item crewmate-stat">
+                        <span class="stat-icon">👨‍🚀</span>
+                        <span id="finalCrewmates" class="stat-value">8</span>
+                        <span class="stat-label">Crewmates</span>
+                    </div>
+                    <div class="stat-item imposter-stat">
+                        <span class="stat-icon">🔪</span>
+                        <span id="finalImposters" class="stat-value">2</span>
+                        <span class="stat-label">Imposters</span>
+                    </div>
+                </div>
+            </div>
+            <button class="btn btn-primary" onclick="resetGame()">
+                NEW GAME
+            </button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
