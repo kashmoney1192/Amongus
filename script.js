@@ -7,11 +7,11 @@ let roleRevealed = false;
 
 // Role Settings
 let roleSettings = {
-    enableEngineer: true,
-    enableScientist: true,
-    enableGuardian: true,
-    enableShapeshifter: true,
-    enableSaboteur: true
+    enableEngineer: false,
+    enableScientist: false,
+    enableGuardian: false,
+    enableShapeshifter: false,
+    enableSaboteur: false
 };
 
 // Role Definitions
