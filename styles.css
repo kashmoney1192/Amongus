@@ -195,6 +195,14 @@ body::before {
     letter-spacing: 2px;
 }
 
+.timestamp {
+    margin-top: 40px;
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.4);
+    font-style: italic;
+    letter-spacing: 0.5px;
+}
+
 /* Screen Title */
 .screen-title {
     font-size: 2rem;
