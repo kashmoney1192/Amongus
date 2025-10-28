@@ -257,20 +257,6 @@ function generateRoles() {
 
     const crewmateCount = playerCount - imposterCount;
 
-    // Determine number of special roles (1-2 per game, based on player count)
-    let specialCrewCount = 0;
-    let specialImposterCount = 0;
-
-    if (playerCount >= 5) {
-        // Add 1-2 special crewmate roles for games with 5+ players
-        specialCrewCount = crewmateCount >= 4 ? Math.min(2, Math.floor(crewmateCount / 3)) : 0;
-    }
-
-    if (playerCount >= 6 && imposterCount >= 2) {
-        // Add 1 special imposter role if there are 2+ imposters
-        specialImposterCount = 1;
-    }
-
     // Build available role arrays based on settings
     const availableImposterRoles = [];
     if (roleSettings.enableShapeshifter) availableImposterRoles.push('shapeshifter');
@@ -281,35 +267,56 @@ function generateRoles() {
     if (roleSettings.enableScientist) availableCrewRoles.push('scientist');
     if (roleSettings.enableGuardian) availableCrewRoles.push('guardian');
 
+    // Determine number of special roles (1-2 per game)
+    let maxSpecialCrew = 0;
+    let maxSpecialImposter = 0;
+
+    if (availableCrewRoles.length > 0 && crewmateCount >= 2) {
+        // Assign 1-2 special crew roles if enabled
+        maxSpecialCrew = Math.min(availableCrewRoles.length, Math.max(1, Math.floor(crewmateCount / 3)));
+    }
+
+    if (availableImposterRoles.length > 0 && imposterCount >= 1) {
+        // Assign 1 special imposter role if enabled
+        maxSpecialImposter = 1;
+    }
+
     // Create imposter roles
+    const assignedImposterRoles = [];
     for (let i = 0; i < imposterCount; i++) {
-        if (i < specialImposterCount && availableImposterRoles.length > 0 && Math.random() > 0.3) {
-            // Assign special imposter role
-            const specialRole = availableImposterRoles[Math.floor(Math.random() * availableImposterRoles.length)];
-            roles.push(specialRole);
-            specialImposterCount--; // Only one special imposter
+        if (assignedImposterRoles.length < maxSpecialImposter && availableImposterRoles.length > 0) {
+            // Assign special imposter role (no duplicates)
+            let specialRole;
+            do {
+                specialRole = availableImposterRoles[Math.floor(Math.random() * availableImposterRoles.length)];
+            } while (assignedImposterRoles.includes(specialRole) && assignedImposterRoles.length < availableImposterRoles.length);
+
+            if (!assignedImposterRoles.includes(specialRole)) {
+                roles.push(specialRole);
+                assignedImposterRoles.push(specialRole);
+            } else {
+                roles.push('imposter');
+            }
         } else {
             roles.push('imposter');
         }
     }
 
     // Create crewmate roles
-    const assignedSpecialRoles = [];
-
+    const assignedCrewRoles = [];
     for (let i = 0; i < crewmateCount; i++) {
-        if (specialCrewCount > 0 && availableCrewRoles.length > 0 && Math.random() > 0.4) {
-            // Assign special crewmate role (avoid duplicates)
+        if (assignedCrewRoles.length < maxSpecialCrew && availableCrewRoles.length > 0) {
+            // Assign special crewmate role (no duplicates)
             let specialRole;
             let attempts = 0;
             do {
                 specialRole = availableCrewRoles[Math.floor(Math.random() * availableCrewRoles.length)];
                 attempts++;
-            } while (assignedSpecialRoles.includes(specialRole) && attempts < availableCrewRoles.length * 2);
+            } while (assignedCrewRoles.includes(specialRole) && attempts < availableCrewRoles.length * 2);
 
-            if (!assignedSpecialRoles.includes(specialRole)) {
+            if (!assignedCrewRoles.includes(specialRole)) {
                 roles.push(specialRole);
-                assignedSpecialRoles.push(specialRole);
-                specialCrewCount--;
+                assignedCrewRoles.push(specialRole);
             } else {
                 roles.push('crewmate');
             }
