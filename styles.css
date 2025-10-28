@@ -206,23 +206,6 @@ body::before {
     letter-spacing: 2px;
 }
 
-/* Button Container */
-.button-container {
-    position: relative;
-    width: 100%;
-    max-width: 300px;
-    height: 60px;
-    margin: 10px auto;
-}
-
-.button-container .btn {
-    position: absolute;
-    top: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 100%;
-}
-
 /* Buttons */
 .btn {
     width: 100%;
@@ -247,13 +230,10 @@ body::before {
 }
 
 .btn-primary:hover {
+    transform: translateY(-2px);
     box-shadow:
         0 6px 20px rgba(102, 126, 234, 0.4),
         0 0 30px rgba(102, 126, 234, 0.3);
-}
-
-.button-container .btn-primary:hover {
-    transform: translate(-50%, -2px);
 }
 
 .btn-secondary {
@@ -272,21 +252,14 @@ body::before {
 }
 
 .btn-success:hover {
+    transform: translateY(-2px);
     box-shadow:
         0 6px 20px rgba(56, 239, 125, 0.4),
         0 0 30px rgba(56, 239, 125, 0.3);
 }
 
-.button-container .btn-success:hover {
-    transform: translate(-50%, -2px);
-}
-
 .btn:active {
     transform: translateY(0);
-}
-
-.button-container .btn:active {
-    transform: translate(-50%, 0);
 }
 
 .pulse {
