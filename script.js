@@ -193,6 +193,7 @@ function adjustPlayers(delta) {
     }
 
     updateCrewmateCount();
+    updateRoleAvailability();
 }
 
 function adjustimposters(delta) {
@@ -201,6 +202,7 @@ function adjustimposters(delta) {
     imposterCount = Math.max(1, Math.min(maxImposters, imposterCount + delta));
     document.getElementById('imposterCount').value = imposterCount;
     updateCrewmateCount();
+    updateRoleAvailability();
 }
 
 function handlePlayerInput() {
@@ -224,6 +226,7 @@ function handlePlayerInput() {
     }
 
     updateCrewmateCount();
+    updateRoleAvailability();
 }
 
 function handleImposterInput() {
@@ -240,6 +243,7 @@ function handleImposterInput() {
     imposterCount = value;
     document.getElementById('imposterCount').value = imposterCount;
     updateCrewmateCount();
+    updateRoleAvailability();
 }
 
 function updateCrewmateCount() {
@@ -255,6 +259,9 @@ function updateRoleSettings() {
     roleSettings.enableGuardian = document.getElementById('enableGuardian').checked;
     roleSettings.enableShapeshifter = document.getElementById('enableShapeshifter').checked;
     roleSettings.enableSaboteur = document.getElementById('enableSaboteur').checked;
+
+    // Update availability of other roles
+    updateRoleAvailability();
 }
 
 function adjustRoleCount(role, delta) {
@@ -266,16 +273,84 @@ function adjustRoleCount(role, delta) {
     let currentCount = roleSettings[countKey];
     let newCount = Math.max(1, currentCount + delta);
 
-    // Limit based on team
+    // Limit based on team and available slots
     if (role === 'shapeshifter' || role === 'saboteur') {
-        newCount = Math.min(imposterCount, newCount);
+        // For imposters: calculate remaining slots
+        const usedSlots = getRemainingSlots('imposter', role);
+        newCount = Math.min(imposterCount - usedSlots, newCount);
     } else {
+        // For crew: calculate remaining slots
         const maxCrew = playerCount - imposterCount;
-        newCount = Math.min(maxCrew, newCount);
+        const usedSlots = getRemainingSlots('crew', role);
+        newCount = Math.min(maxCrew - usedSlots, newCount);
     }
 
     roleSettings[countKey] = newCount;
     countElement.textContent = newCount;
+
+    // Update UI to show which roles can be enabled
+    updateRoleAvailability();
+}
+
+function getRemainingSlots(team, excludeRole) {
+    let used = 0;
+
+    if (team === 'imposter') {
+        if (excludeRole !== 'shapeshifter' && roleSettings.enableShapeshifter) {
+            used += roleSettings.shapeshifterCount;
+        }
+        if (excludeRole !== 'saboteur' && roleSettings.enableSaboteur) {
+            used += roleSettings.saboteurCount;
+        }
+    } else {
+        if (excludeRole !== 'engineer' && roleSettings.enableEngineer) {
+            used += roleSettings.engineerCount;
+        }
+        if (excludeRole !== 'scientist' && roleSettings.enableScientist) {
+            used += roleSettings.scientistCount;
+        }
+        if (excludeRole !== 'guardian' && roleSettings.enableGuardian) {
+            used += roleSettings.guardianCount;
+        }
+    }
+
+    return used;
+}
+
+function updateRoleAvailability() {
+    const maxCrew = playerCount - imposterCount;
+    const usedCrewSlots = getRemainingSlots('crew', null);
+    const usedImposterSlots = getRemainingSlots('imposter', null);
+
+    // Disable crew role toggles if all slots are used
+    const crewRoles = ['engineer', 'scientist', 'guardian'];
+    crewRoles.forEach(role => {
+        const checkbox = document.getElementById('enable' + role.charAt(0).toUpperCase() + role.slice(1));
+        const toggleGroup = checkbox.closest('.toggle-group');
+
+        if (!roleSettings['enable' + role.charAt(0).toUpperCase() + role.slice(1)] && usedCrewSlots >= maxCrew) {
+            toggleGroup.style.opacity = '0.3';
+            toggleGroup.style.pointerEvents = 'none';
+        } else {
+            toggleGroup.style.opacity = '1';
+            toggleGroup.style.pointerEvents = 'all';
+        }
+    });
+
+    // Disable imposter role toggles if all slots are used
+    const imposterRoles = ['shapeshifter', 'saboteur'];
+    imposterRoles.forEach(role => {
+        const checkbox = document.getElementById('enable' + role.charAt(0).toUpperCase() + role.slice(1));
+        const toggleGroup = checkbox.closest('.toggle-group');
+
+        if (!roleSettings['enable' + role.charAt(0).toUpperCase() + role.slice(1)] && usedImposterSlots >= imposterCount) {
+            toggleGroup.style.opacity = '0.3';
+            toggleGroup.style.pointerEvents = 'none';
+        } else {
+            toggleGroup.style.opacity = '1';
+            toggleGroup.style.pointerEvents = 'all';
+        }
+    });
 }
 
 // Role Generation
