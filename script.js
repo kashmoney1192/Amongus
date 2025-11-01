@@ -193,6 +193,7 @@ function adjustPlayers(delta) {
     }
 
     updateCrewmateCount();
+    adjustRoleCountsForNewTotals();
     updateRoleAvailability();
 }
 
@@ -202,6 +203,7 @@ function adjustimposters(delta) {
     imposterCount = Math.max(1, Math.min(maxImposters, imposterCount + delta));
     document.getElementById('imposterCount').value = imposterCount;
     updateCrewmateCount();
+    adjustRoleCountsForNewTotals();
     updateRoleAvailability();
 }
 
@@ -226,6 +228,7 @@ function handlePlayerInput() {
     }
 
     updateCrewmateCount();
+    adjustRoleCountsForNewTotals();
     updateRoleAvailability();
 }
 
@@ -243,7 +246,96 @@ function handleImposterInput() {
     imposterCount = value;
     document.getElementById('imposterCount').value = imposterCount;
     updateCrewmateCount();
+    adjustRoleCountsForNewTotals();
     updateRoleAvailability();
+}
+
+function adjustRoleCountsForNewTotals() {
+    const maxCrew = playerCount - imposterCount;
+
+    // Adjust crew role counts if they exceed new maximum
+    if (roleSettings.enableEngineer) {
+        const newCount = Math.min(roleSettings.engineerCount, maxCrew);
+        if (newCount !== roleSettings.engineerCount) {
+            roleSettings.engineerCount = newCount;
+            document.getElementById('engineerCount').textContent = newCount;
+        }
+    }
+
+    if (roleSettings.enableScientist) {
+        const newCount = Math.min(roleSettings.scientistCount, maxCrew);
+        if (newCount !== roleSettings.scientistCount) {
+            roleSettings.scientistCount = newCount;
+            document.getElementById('scientistCount').textContent = newCount;
+        }
+    }
+
+    if (roleSettings.enableGuardian) {
+        const newCount = Math.min(roleSettings.guardianCount, maxCrew);
+        if (newCount !== roleSettings.guardianCount) {
+            roleSettings.guardianCount = newCount;
+            document.getElementById('guardianCount').textContent = newCount;
+        }
+    }
+
+    // Adjust imposter role counts if they exceed new maximum
+    if (roleSettings.enableShapeshifter) {
+        const newCount = Math.min(roleSettings.shapeshifterCount, imposterCount);
+        if (newCount !== roleSettings.shapeshifterCount) {
+            roleSettings.shapeshifterCount = newCount;
+            document.getElementById('shapeshifterCount').textContent = newCount;
+        }
+    }
+
+    if (roleSettings.enableSaboteur) {
+        const newCount = Math.min(roleSettings.saboteurCount, imposterCount);
+        if (newCount !== roleSettings.saboteurCount) {
+            roleSettings.saboteurCount = newCount;
+            document.getElementById('saboteurCount').textContent = newCount;
+        }
+    }
+
+    // Also need to ensure total doesn't exceed available slots
+    const totalCrewRoles =
+        (roleSettings.enableEngineer ? roleSettings.engineerCount : 0) +
+        (roleSettings.enableScientist ? roleSettings.scientistCount : 0) +
+        (roleSettings.enableGuardian ? roleSettings.guardianCount : 0);
+
+    if (totalCrewRoles > maxCrew) {
+        // Scale down proportionally
+        const ratio = maxCrew / totalCrewRoles;
+
+        if (roleSettings.enableEngineer) {
+            roleSettings.engineerCount = Math.max(1, Math.floor(roleSettings.engineerCount * ratio));
+            document.getElementById('engineerCount').textContent = roleSettings.engineerCount;
+        }
+        if (roleSettings.enableScientist) {
+            roleSettings.scientistCount = Math.max(1, Math.floor(roleSettings.scientistCount * ratio));
+            document.getElementById('scientistCount').textContent = roleSettings.scientistCount;
+        }
+        if (roleSettings.enableGuardian) {
+            roleSettings.guardianCount = Math.max(1, Math.floor(roleSettings.guardianCount * ratio));
+            document.getElementById('guardianCount').textContent = roleSettings.guardianCount;
+        }
+    }
+
+    const totalImposterRoles =
+        (roleSettings.enableShapeshifter ? roleSettings.shapeshifterCount : 0) +
+        (roleSettings.enableSaboteur ? roleSettings.saboteurCount : 0);
+
+    if (totalImposterRoles > imposterCount) {
+        // Scale down proportionally
+        const ratio = imposterCount / totalImposterRoles;
+
+        if (roleSettings.enableShapeshifter) {
+            roleSettings.shapeshifterCount = Math.max(1, Math.floor(roleSettings.shapeshifterCount * ratio));
+            document.getElementById('shapeshifterCount').textContent = roleSettings.shapeshifterCount;
+        }
+        if (roleSettings.enableSaboteur) {
+            roleSettings.saboteurCount = Math.max(1, Math.floor(roleSettings.saboteurCount * ratio));
+            document.getElementById('saboteurCount').textContent = roleSettings.saboteurCount;
+        }
+    }
 }
 
 function updateCrewmateCount() {
