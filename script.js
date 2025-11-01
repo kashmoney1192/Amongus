@@ -11,7 +11,12 @@ let roleSettings = {
     enableScientist: false,
     enableGuardian: false,
     enableShapeshifter: false,
-    enableSaboteur: false
+    enableSaboteur: false,
+    engineerPercent: 30,
+    scientistPercent: 30,
+    guardianPercent: 30,
+    shapeshifterPercent: 50,
+    saboteurPercent: 50
 };
 
 // Role Definitions
@@ -244,11 +249,32 @@ function updateCrewmateCount() {
 }
 
 function updateRoleSettings() {
+    // Update toggle states
     roleSettings.enableEngineer = document.getElementById('enableEngineer').checked;
     roleSettings.enableScientist = document.getElementById('enableScientist').checked;
     roleSettings.enableGuardian = document.getElementById('enableGuardian').checked;
     roleSettings.enableShapeshifter = document.getElementById('enableShapeshifter').checked;
     roleSettings.enableSaboteur = document.getElementById('enableSaboteur').checked;
+
+    // Update percentage values and labels
+    roleSettings.engineerPercent = parseInt(document.getElementById('engineerPercent').value);
+    roleSettings.scientistPercent = parseInt(document.getElementById('scientistPercent').value);
+    roleSettings.guardianPercent = parseInt(document.getElementById('guardianPercent').value);
+    roleSettings.shapeshifterPercent = parseInt(document.getElementById('shapeshifterPercent').value);
+    roleSettings.saboteurPercent = parseInt(document.getElementById('saboteurPercent').value);
+
+    document.getElementById('engineerPercentLabel').textContent = roleSettings.engineerPercent + '%';
+    document.getElementById('scientistPercentLabel').textContent = roleSettings.scientistPercent + '%';
+    document.getElementById('guardianPercentLabel').textContent = roleSettings.guardianPercent + '%';
+    document.getElementById('shapeshifterPercentLabel').textContent = roleSettings.shapeshifterPercent + '%';
+    document.getElementById('saboteurPercentLabel').textContent = roleSettings.saboteurPercent + '%';
+
+    // Enable/disable sliders based on toggle state
+    document.getElementById('engineerPercent').disabled = !roleSettings.enableEngineer;
+    document.getElementById('scientistPercent').disabled = !roleSettings.enableScientist;
+    document.getElementById('guardianPercent').disabled = !roleSettings.enableGuardian;
+    document.getElementById('shapeshifterPercent').disabled = !roleSettings.enableShapeshifter;
+    document.getElementById('saboteurPercent').disabled = !roleSettings.enableSaboteur;
 }
 
 // Role Generation
@@ -257,15 +283,25 @@ function generateRoles() {
 
     const crewmateCount = playerCount - imposterCount;
 
-    // Build available role arrays based on settings
+    // Build available role arrays with percentages
     const availableImposterRoles = [];
-    if (roleSettings.enableShapeshifter) availableImposterRoles.push('shapeshifter');
-    if (roleSettings.enableSaboteur) availableImposterRoles.push('saboteur');
+    if (roleSettings.enableShapeshifter) {
+        availableImposterRoles.push({ role: 'shapeshifter', percent: roleSettings.shapeshifterPercent });
+    }
+    if (roleSettings.enableSaboteur) {
+        availableImposterRoles.push({ role: 'saboteur', percent: roleSettings.saboteurPercent });
+    }
 
     const availableCrewRoles = [];
-    if (roleSettings.enableEngineer) availableCrewRoles.push('engineer');
-    if (roleSettings.enableScientist) availableCrewRoles.push('scientist');
-    if (roleSettings.enableGuardian) availableCrewRoles.push('guardian');
+    if (roleSettings.enableEngineer) {
+        availableCrewRoles.push({ role: 'engineer', percent: roleSettings.engineerPercent });
+    }
+    if (roleSettings.enableScientist) {
+        availableCrewRoles.push({ role: 'scientist', percent: roleSettings.scientistPercent });
+    }
+    if (roleSettings.enableGuardian) {
+        availableCrewRoles.push({ role: 'guardian', percent: roleSettings.guardianPercent });
+    }
 
     // Determine number of special roles (1-2 per game)
     let maxSpecialCrew = 0;
@@ -282,45 +318,41 @@ function generateRoles() {
     }
 
     // Create imposter roles
-    const assignedImposterRoles = [];
     for (let i = 0; i < imposterCount; i++) {
-        if (assignedImposterRoles.length < maxSpecialImposter && availableImposterRoles.length > 0) {
-            // Assign special imposter role (no duplicates)
-            let specialRole;
-            do {
-                specialRole = availableImposterRoles[Math.floor(Math.random() * availableImposterRoles.length)];
-            } while (assignedImposterRoles.includes(specialRole) && assignedImposterRoles.length < availableImposterRoles.length);
+        let assigned = false;
 
-            if (!assignedImposterRoles.includes(specialRole)) {
-                roles.push(specialRole);
-                assignedImposterRoles.push(specialRole);
-            } else {
-                roles.push('imposter');
+        // Check each available imposter role against its percentage
+        for (const roleObj of availableImposterRoles) {
+            const randomChance = Math.random() * 100;
+            if (randomChance < roleObj.percent) {
+                roles.push(roleObj.role);
+                assigned = true;
+                break; // Only assign one special role per imposter
             }
-        } else {
+        }
+
+        // If no special role was assigned, assign regular imposter
+        if (!assigned) {
             roles.push('imposter');
         }
     }
 
     // Create crewmate roles
-    const assignedCrewRoles = [];
     for (let i = 0; i < crewmateCount; i++) {
-        if (assignedCrewRoles.length < maxSpecialCrew && availableCrewRoles.length > 0) {
-            // Assign special crewmate role (no duplicates)
-            let specialRole;
-            let attempts = 0;
-            do {
-                specialRole = availableCrewRoles[Math.floor(Math.random() * availableCrewRoles.length)];
-                attempts++;
-            } while (assignedCrewRoles.includes(specialRole) && attempts < availableCrewRoles.length * 2);
+        let assigned = false;
 
-            if (!assignedCrewRoles.includes(specialRole)) {
-                roles.push(specialRole);
-                assignedCrewRoles.push(specialRole);
-            } else {
-                roles.push('crewmate');
+        // Check each available crew role against its percentage
+        for (const roleObj of availableCrewRoles) {
+            const randomChance = Math.random() * 100;
+            if (randomChance < roleObj.percent) {
+                roles.push(roleObj.role);
+                assigned = true;
+                break; // Only assign one special role per crewmate
             }
-        } else {
+        }
+
+        // If no special role was assigned, assign regular crewmate
+        if (!assigned) {
             roles.push('crewmate');
         }
     }
