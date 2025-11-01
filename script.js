@@ -253,87 +253,76 @@ function handleImposterInput() {
 function adjustRoleCountsForNewTotals() {
     const maxCrew = playerCount - imposterCount;
 
-    // Adjust crew role counts if they exceed new maximum
-    if (roleSettings.enableEngineer) {
-        const newCount = Math.min(roleSettings.engineerCount, maxCrew);
-        if (newCount !== roleSettings.engineerCount) {
-            roleSettings.engineerCount = newCount;
-            document.getElementById('engineerCount').textContent = newCount;
-        }
-    }
-
-    if (roleSettings.enableScientist) {
-        const newCount = Math.min(roleSettings.scientistCount, maxCrew);
-        if (newCount !== roleSettings.scientistCount) {
-            roleSettings.scientistCount = newCount;
-            document.getElementById('scientistCount').textContent = newCount;
-        }
-    }
-
-    if (roleSettings.enableGuardian) {
-        const newCount = Math.min(roleSettings.guardianCount, maxCrew);
-        if (newCount !== roleSettings.guardianCount) {
-            roleSettings.guardianCount = newCount;
-            document.getElementById('guardianCount').textContent = newCount;
-        }
-    }
-
-    // Adjust imposter role counts if they exceed new maximum
-    if (roleSettings.enableShapeshifter) {
-        const newCount = Math.min(roleSettings.shapeshifterCount, imposterCount);
-        if (newCount !== roleSettings.shapeshifterCount) {
-            roleSettings.shapeshifterCount = newCount;
-            document.getElementById('shapeshifterCount').textContent = newCount;
-        }
-    }
-
-    if (roleSettings.enableSaboteur) {
-        const newCount = Math.min(roleSettings.saboteurCount, imposterCount);
-        if (newCount !== roleSettings.saboteurCount) {
-            roleSettings.saboteurCount = newCount;
-            document.getElementById('saboteurCount').textContent = newCount;
-        }
-    }
-
-    // Also need to ensure total doesn't exceed available slots
-    const totalCrewRoles =
+    // Calculate total crew roles needed
+    let totalCrewRoles =
         (roleSettings.enableEngineer ? roleSettings.engineerCount : 0) +
         (roleSettings.enableScientist ? roleSettings.scientistCount : 0) +
         (roleSettings.enableGuardian ? roleSettings.guardianCount : 0);
 
+    // If total exceeds max, remove from roles in reverse order (last added first)
     if (totalCrewRoles > maxCrew) {
-        // Scale down proportionally
-        const ratio = maxCrew / totalCrewRoles;
+        const crewRoles = ['guardian', 'scientist', 'engineer']; // Reverse order
 
-        if (roleSettings.enableEngineer) {
-            roleSettings.engineerCount = Math.max(1, Math.floor(roleSettings.engineerCount * ratio));
-            document.getElementById('engineerCount').textContent = roleSettings.engineerCount;
-        }
-        if (roleSettings.enableScientist) {
-            roleSettings.scientistCount = Math.max(1, Math.floor(roleSettings.scientistCount * ratio));
-            document.getElementById('scientistCount').textContent = roleSettings.scientistCount;
-        }
-        if (roleSettings.enableGuardian) {
-            roleSettings.guardianCount = Math.max(1, Math.floor(roleSettings.guardianCount * ratio));
-            document.getElementById('guardianCount').textContent = roleSettings.guardianCount;
+        for (const role of crewRoles) {
+            const enableKey = 'enable' + role.charAt(0).toUpperCase() + role.slice(1);
+            const countKey = role + 'Count';
+
+            if (roleSettings[enableKey] && totalCrewRoles > maxCrew) {
+                const overflow = totalCrewRoles - maxCrew;
+                const currentCount = roleSettings[countKey];
+
+                if (currentCount <= overflow) {
+                    // Remove this role entirely (set count to 0 and disable)
+                    roleSettings[countKey] = 0;
+                    roleSettings[enableKey] = false;
+                    document.getElementById(enableKey.replace('enable', 'enable')).checked = false;
+                    document.getElementById(countKey).textContent = 1; // Reset display to 1
+                    roleSettings[countKey] = 1; // Reset to 1 for next time
+                    totalCrewRoles -= currentCount;
+                } else {
+                    // Reduce count by overflow amount
+                    roleSettings[countKey] = currentCount - overflow;
+                    document.getElementById(countKey).textContent = roleSettings[countKey];
+                    totalCrewRoles = maxCrew;
+                    break;
+                }
+            }
         }
     }
 
-    const totalImposterRoles =
+    // Calculate total imposter roles needed
+    let totalImposterRoles =
         (roleSettings.enableShapeshifter ? roleSettings.shapeshifterCount : 0) +
         (roleSettings.enableSaboteur ? roleSettings.saboteurCount : 0);
 
+    // If total exceeds max, remove from roles in reverse order
     if (totalImposterRoles > imposterCount) {
-        // Scale down proportionally
-        const ratio = imposterCount / totalImposterRoles;
+        const imposterRoles = ['saboteur', 'shapeshifter']; // Reverse order
 
-        if (roleSettings.enableShapeshifter) {
-            roleSettings.shapeshifterCount = Math.max(1, Math.floor(roleSettings.shapeshifterCount * ratio));
-            document.getElementById('shapeshifterCount').textContent = roleSettings.shapeshifterCount;
-        }
-        if (roleSettings.enableSaboteur) {
-            roleSettings.saboteurCount = Math.max(1, Math.floor(roleSettings.saboteurCount * ratio));
-            document.getElementById('saboteurCount').textContent = roleSettings.saboteurCount;
+        for (const role of imposterRoles) {
+            const enableKey = 'enable' + role.charAt(0).toUpperCase() + role.slice(1);
+            const countKey = role + 'Count';
+
+            if (roleSettings[enableKey] && totalImposterRoles > imposterCount) {
+                const overflow = totalImposterRoles - imposterCount;
+                const currentCount = roleSettings[countKey];
+
+                if (currentCount <= overflow) {
+                    // Remove this role entirely (set count to 0 and disable)
+                    roleSettings[countKey] = 0;
+                    roleSettings[enableKey] = false;
+                    document.getElementById(enableKey.replace('enable', 'enable')).checked = false;
+                    document.getElementById(countKey).textContent = 1; // Reset display to 1
+                    roleSettings[countKey] = 1; // Reset to 1 for next time
+                    totalImposterRoles -= currentCount;
+                } else {
+                    // Reduce count by overflow amount
+                    roleSettings[countKey] = currentCount - overflow;
+                    document.getElementById(countKey).textContent = roleSettings[countKey];
+                    totalImposterRoles = imposterCount;
+                    break;
+                }
+            }
         }
     }
 }
