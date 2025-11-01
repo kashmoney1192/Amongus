@@ -12,11 +12,11 @@ let roleSettings = {
     enableGuardian: false,
     enableShapeshifter: false,
     enableSaboteur: false,
-    engineerPercent: 30,
-    scientistPercent: 30,
-    guardianPercent: 30,
-    shapeshifterPercent: 50,
-    saboteurPercent: 50
+    engineerCount: 1,
+    scientistCount: 1,
+    guardianCount: 1,
+    shapeshifterCount: 1,
+    saboteurCount: 1
 };
 
 // Role Definitions
@@ -255,26 +255,27 @@ function updateRoleSettings() {
     roleSettings.enableGuardian = document.getElementById('enableGuardian').checked;
     roleSettings.enableShapeshifter = document.getElementById('enableShapeshifter').checked;
     roleSettings.enableSaboteur = document.getElementById('enableSaboteur').checked;
+}
 
-    // Update percentage values and labels
-    roleSettings.engineerPercent = parseInt(document.getElementById('engineerPercent').value);
-    roleSettings.scientistPercent = parseInt(document.getElementById('scientistPercent').value);
-    roleSettings.guardianPercent = parseInt(document.getElementById('guardianPercent').value);
-    roleSettings.shapeshifterPercent = parseInt(document.getElementById('shapeshifterPercent').value);
-    roleSettings.saboteurPercent = parseInt(document.getElementById('saboteurPercent').value);
+function adjustRoleCount(role, delta) {
+    playSound('click');
 
-    document.getElementById('engineerPercentLabel').textContent = roleSettings.engineerPercent + '%';
-    document.getElementById('scientistPercentLabel').textContent = roleSettings.scientistPercent + '%';
-    document.getElementById('guardianPercentLabel').textContent = roleSettings.guardianPercent + '%';
-    document.getElementById('shapeshifterPercentLabel').textContent = roleSettings.shapeshifterPercent + '%';
-    document.getElementById('saboteurPercentLabel').textContent = roleSettings.saboteurPercent + '%';
+    const countKey = role + 'Count';
+    const countElement = document.getElementById(countKey);
 
-    // Enable/disable sliders based on toggle state
-    document.getElementById('engineerPercent').disabled = !roleSettings.enableEngineer;
-    document.getElementById('scientistPercent').disabled = !roleSettings.enableScientist;
-    document.getElementById('guardianPercent').disabled = !roleSettings.enableGuardian;
-    document.getElementById('shapeshifterPercent').disabled = !roleSettings.enableShapeshifter;
-    document.getElementById('saboteurPercent').disabled = !roleSettings.enableSaboteur;
+    let currentCount = roleSettings[countKey];
+    let newCount = Math.max(1, currentCount + delta);
+
+    // Limit based on team
+    if (role === 'shapeshifter' || role === 'saboteur') {
+        newCount = Math.min(imposterCount, newCount);
+    } else {
+        const maxCrew = playerCount - imposterCount;
+        newCount = Math.min(maxCrew, newCount);
+    }
+
+    roleSettings[countKey] = newCount;
+    countElement.textContent = newCount;
 }
 
 // Role Generation
@@ -283,78 +284,69 @@ function generateRoles() {
 
     const crewmateCount = playerCount - imposterCount;
 
-    // Build available role arrays with percentages
-    const availableImposterRoles = [];
-    if (roleSettings.enableShapeshifter) {
-        availableImposterRoles.push({ role: 'shapeshifter', percent: roleSettings.shapeshifterPercent });
-    }
-    if (roleSettings.enableSaboteur) {
-        availableImposterRoles.push({ role: 'saboteur', percent: roleSettings.saboteurPercent });
-    }
+    // Add special imposter roles based on count
+    let shapeshiftersToAdd = roleSettings.enableShapeshifter ? Math.min(roleSettings.shapeshifterCount, imposterCount) : 0;
+    let saboteursToAdd = roleSettings.enableSaboteur ? Math.min(roleSettings.saboteurCount, imposterCount) : 0;
 
-    const availableCrewRoles = [];
-    if (roleSettings.enableEngineer) {
-        availableCrewRoles.push({ role: 'engineer', percent: roleSettings.engineerPercent });
-    }
-    if (roleSettings.enableScientist) {
-        availableCrewRoles.push({ role: 'scientist', percent: roleSettings.scientistPercent });
-    }
-    if (roleSettings.enableGuardian) {
-        availableCrewRoles.push({ role: 'guardian', percent: roleSettings.guardianPercent });
+    // Make sure total special imposters don't exceed imposter count
+    const totalSpecialImposters = shapeshiftersToAdd + saboteursToAdd;
+    if (totalSpecialImposters > imposterCount) {
+        // Scale down proportionally
+        const ratio = imposterCount / totalSpecialImposters;
+        shapeshiftersToAdd = Math.floor(shapeshiftersToAdd * ratio);
+        saboteursToAdd = Math.floor(saboteursToAdd * ratio);
     }
 
-    // Determine number of special roles (1-2 per game)
-    let maxSpecialCrew = 0;
-    let maxSpecialImposter = 0;
-
-    if (availableCrewRoles.length > 0 && crewmateCount >= 2) {
-        // Assign 1-2 special crew roles if enabled
-        maxSpecialCrew = Math.min(availableCrewRoles.length, Math.max(1, Math.floor(crewmateCount / 3)));
+    // Add shapeshifters
+    for (let i = 0; i < shapeshiftersToAdd; i++) {
+        roles.push('shapeshifter');
     }
 
-    if (availableImposterRoles.length > 0 && imposterCount >= 1) {
-        // Assign 1 special imposter role if enabled
-        maxSpecialImposter = 1;
+    // Add saboteurs
+    for (let i = 0; i < saboteursToAdd; i++) {
+        roles.push('saboteur');
     }
 
-    // Create imposter roles
-    for (let i = 0; i < imposterCount; i++) {
-        let assigned = false;
-
-        // Check each available imposter role against its percentage
-        for (const roleObj of availableImposterRoles) {
-            const randomChance = Math.random() * 100;
-            if (randomChance < roleObj.percent) {
-                roles.push(roleObj.role);
-                assigned = true;
-                break; // Only assign one special role per imposter
-            }
-        }
-
-        // If no special role was assigned, assign regular imposter
-        if (!assigned) {
-            roles.push('imposter');
-        }
+    // Fill remaining imposters
+    const regularImposters = imposterCount - shapeshiftersToAdd - saboteursToAdd;
+    for (let i = 0; i < regularImposters; i++) {
+        roles.push('imposter');
     }
 
-    // Create crewmate roles
-    for (let i = 0; i < crewmateCount; i++) {
-        let assigned = false;
+    // Add special crew roles based on count
+    let engineersToAdd = roleSettings.enableEngineer ? Math.min(roleSettings.engineerCount, crewmateCount) : 0;
+    let scientistsToAdd = roleSettings.enableScientist ? Math.min(roleSettings.scientistCount, crewmateCount) : 0;
+    let guardiansToAdd = roleSettings.enableGuardian ? Math.min(roleSettings.guardianCount, crewmateCount) : 0;
 
-        // Check each available crew role against its percentage
-        for (const roleObj of availableCrewRoles) {
-            const randomChance = Math.random() * 100;
-            if (randomChance < roleObj.percent) {
-                roles.push(roleObj.role);
-                assigned = true;
-                break; // Only assign one special role per crewmate
-            }
-        }
+    // Make sure total special crew don't exceed crewmate count
+    const totalSpecialCrew = engineersToAdd + scientistsToAdd + guardiansToAdd;
+    if (totalSpecialCrew > crewmateCount) {
+        // Scale down proportionally
+        const ratio = crewmateCount / totalSpecialCrew;
+        engineersToAdd = Math.floor(engineersToAdd * ratio);
+        scientistsToAdd = Math.floor(scientistsToAdd * ratio);
+        guardiansToAdd = Math.floor(guardiansToAdd * ratio);
+    }
 
-        // If no special role was assigned, assign regular crewmate
-        if (!assigned) {
-            roles.push('crewmate');
-        }
+    // Add engineers
+    for (let i = 0; i < engineersToAdd; i++) {
+        roles.push('engineer');
+    }
+
+    // Add scientists
+    for (let i = 0; i < scientistsToAdd; i++) {
+        roles.push('scientist');
+    }
+
+    // Add guardians
+    for (let i = 0; i < guardiansToAdd; i++) {
+        roles.push('guardian');
+    }
+
+    // Fill remaining crewmates
+    const regularCrewmates = crewmateCount - engineersToAdd - scientistsToAdd - guardiansToAdd;
+    for (let i = 0; i < regularCrewmates; i++) {
+        roles.push('crewmate');
     }
 
     // Shuffle roles using Fisher-Yates algorithm

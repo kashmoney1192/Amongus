@@ -74,9 +74,13 @@
                             <input type="checkbox" id="enableEngineer" onchange="updateRoleSettings()">
                             <span class="toggle-switch"></span>
                         </label>
-                        <div class="percentage-control">
-                            <input type="range" id="engineerPercent" min="0" max="100" value="30" step="5" onchange="updateRoleSettings()" disabled>
-                            <span id="engineerPercentLabel" class="percent-label">30%</span>
+                        <div class="count-control">
+                            <button class="count-btn" onclick="adjustRoleCount('engineer', -1)">-</button>
+                            <span class="count-display">
+                                <span id="engineerCount" class="count-number">1</span>
+                                <span class="count-label">player</span>
+                            </span>
+                            <button class="count-btn" onclick="adjustRoleCount('engineer', 1)">+</button>
                         </div>
                     </div>
 
@@ -86,9 +90,13 @@
                             <input type="checkbox" id="enableScientist" onchange="updateRoleSettings()">
                             <span class="toggle-switch"></span>
                         </label>
-                        <div class="percentage-control">
-                            <input type="range" id="scientistPercent" min="0" max="100" value="30" step="5" onchange="updateRoleSettings()" disabled>
-                            <span id="scientistPercentLabel" class="percent-label">30%</span>
+                        <div class="count-control">
+                            <button class="count-btn" onclick="adjustRoleCount('scientist', -1)">-</button>
+                            <span class="count-display">
+                                <span id="scientistCount" class="count-number">1</span>
+                                <span class="count-label">player</span>
+                            </span>
+                            <button class="count-btn" onclick="adjustRoleCount('scientist', 1)">+</button>
                         </div>
                     </div>
 
@@ -98,9 +106,13 @@
                             <input type="checkbox" id="enableGuardian" onchange="updateRoleSettings()">
                             <span class="toggle-switch"></span>
                         </label>
-                        <div class="percentage-control">
-                            <input type="range" id="guardianPercent" min="0" max="100" value="30" step="5" onchange="updateRoleSettings()" disabled>
-                            <span id="guardianPercentLabel" class="percent-label">30%</span>
+                        <div class="count-control">
+                            <button class="count-btn" onclick="adjustRoleCount('guardian', -1)">-</button>
+                            <span class="count-display">
+                                <span id="guardianCount" class="count-number">1</span>
+                                <span class="count-label">player</span>
+                            </span>
+                            <button class="count-btn" onclick="adjustRoleCount('guardian', 1)">+</button>
                         </div>
                     </div>
 
@@ -110,9 +122,13 @@
                             <input type="checkbox" id="enableShapeshifter" onchange="updateRoleSettings()">
                             <span class="toggle-switch"></span>
                         </label>
-                        <div class="percentage-control">
-                            <input type="range" id="shapeshifterPercent" min="0" max="100" value="50" step="5" onchange="updateRoleSettings()" disabled>
-                            <span id="shapeshifterPercentLabel" class="percent-label">50%</span>
+                        <div class="count-control">
+                            <button class="count-btn" onclick="adjustRoleCount('shapeshifter', -1)">-</button>
+                            <span class="count-display">
+                                <span id="shapeshifterCount" class="count-number">1</span>
+                                <span class="count-label">imposter</span>
+                            </span>
+                            <button class="count-btn" onclick="adjustRoleCount('shapeshifter', 1)">+</button>
                         </div>
                     </div>
 
@@ -122,9 +138,13 @@
                             <input type="checkbox" id="enableSaboteur" onchange="updateRoleSettings()">
                             <span class="toggle-switch"></span>
                         </label>
-                        <div class="percentage-control">
-                            <input type="range" id="saboteurPercent" min="0" max="100" value="50" step="5" onchange="updateRoleSettings()" disabled>
-                            <span id="saboteurPercentLabel" class="percent-label">50%</span>
+                        <div class="count-control">
+                            <button class="count-btn" onclick="adjustRoleCount('saboteur', -1)">-</button>
+                            <span class="count-display">
+                                <span id="saboteurCount" class="count-number">1</span>
+                                <span class="count-label">imposter</span>
+                            </span>
+                            <button class="count-btn" onclick="adjustRoleCount('saboteur', 1)">+</button>
                         </div>
                     </div>
                 </div>

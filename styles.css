@@ -395,55 +395,69 @@ body::before {
     background: rgba(255, 255, 255, 0.08);
 }
 
-.percentage-control {
+.count-control {
     display: flex;
     align-items: center;
-    gap: 10px;
+    justify-content: center;
+    gap: 15px;
     margin-top: 10px;
-    padding-left: 35px;
-}
-
-.percentage-control input[type="range"] {
-    flex: 1;
-    height: 6px;
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 3px;
-    outline: none;
-    -webkit-appearance: none;
-}
-
-.percentage-control input[type="range"]:disabled {
+    padding: 8px;
     opacity: 0.3;
-    cursor: not-allowed;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
 }
 
-.percentage-control input[type="range"]::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 18px;
-    height: 18px;
+.toggle-group:has(input[type="checkbox"]:checked) .count-control {
+    opacity: 1;
+    pointer-events: all;
+}
+
+.count-btn {
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    cursor: pointer;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-}
-
-.percentage-control input[type="range"]::-moz-range-thumb {
-    width: 18px;
-    height: 18px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    cursor: pointer;
-    border: none;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-}
-
-.percent-label {
-    min-width: 45px;
-    text-align: right;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    font-size: 1.2rem;
     font-weight: bold;
-    font-size: 0.95rem;
-    color: rgba(255, 255, 255, 0.8);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.count-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.5);
+    transform: scale(1.1);
+}
+
+.count-btn:active {
+    transform: scale(0.95);
+}
+
+.count-display {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 80px;
+}
+
+.count-number {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #fff;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+.count-label {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.6);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-top: 2px;
 }
 
 .toggle-label {
